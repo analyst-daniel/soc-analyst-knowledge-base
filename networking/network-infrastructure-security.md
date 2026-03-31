@@ -1,7 +1,5 @@
 # Topic: Network Infrastructure and Security Mechanisms
 
-
-
 ## 1. Definition
 Secure communication between devices across different networks using routing, segmentation, and encryption mechanisms.
 
