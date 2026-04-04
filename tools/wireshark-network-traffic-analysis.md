@@ -1,69 +1,73 @@
 # Topic: Wireshark Network Traffic Analysis
 
 ## 1. Definition
-Wireshark is a packet analysis tool used to capture, inspect, and analyze network traffic at multiple OSI layers.  
-It enables protocol-level visibility for troubleshooting, threat detection, and forensic analysis.
+Wireshark is a packet analysis tool used to inspect network traffic at multiple OSI layers.  
+It enables protocol analysis, communication pattern identification, and detection of security anomalies.
 
 ## 2. Key Concepts
-- Packet structure follows the OSI model (Layer 1–7).
-- Frame → metadata, timestamp, capture details (Layer 1).
-- Ethernet → source and destination MAC addresses (Layer 2).
-- IP → source/destination IP, TTL, fragmentation (Layer 3).
-- TCP/UDP → ports, sequence numbers, flags (Layer 4).
-- Application layer → protocols such as HTTP, DNS (Layer 7).
-- Display filters reduce noise and isolate relevant traffic.
-- Statistical tools summarize traffic patterns and relationships.
+- Packet analysis follows OSI model decomposition (Layer 2–7 visible).
+- Frame (Layer 1): capture metadata, timestamp, interface.
+- MAC addresses (Layer 2): source and destination hardware identifiers.
+- IP addresses (Layer 3): logical addressing, TTL, protocol type.
+- TCP/UDP (Layer 4): ports, flags, sequence numbers.
+- Application layer (Layer 5–7): HTTP, DNS, SMB data.
+- Display filters refine analysis scope.
+- Capture filters limit recorded traffic at ingestion.
+- Logical operators: `and`, `or`, `==`, `!=`.
+- Common filters:
+  - `ip.addr == X`
+  - `tcp.port == X`
+  - `arp.opcode == 2`
 
 ## 3. How It Works
-- Select an active network interface for capture.
-- Capture packets and stop capture for static analysis.
-- Inspect packets by expanding OSI layers.
-- Apply filters to isolate relevant traffic.
-- Analyze protocol behavior and sequences:
-  - ARP → IP-to-MAC resolution.
-  - ICMP → diagnostic communication.
-  - TCP → connection establishment and reliability.
-  - DNS → domain-to-IP resolution.
-  - HTTP/HTTPS → web communication.
-- Use statistics tools:
-  - Protocol Hierarchy → protocol distribution.
-  - Endpoints → communicating hosts.
-  - Conversations → session-level communication.
+- Capture traffic via interface, tap, or port mirroring.
+- Decompose packets into OSI layers.
+- Apply display filters to isolate relevant traffic.
+- Identify communication patterns instead of reviewing all packets.
+- Analyze protocol-specific behavior:
+  - ARP resolves IP to MAC (Layer 2).
+  - ICMP provides diagnostics (Layer 3).
+  - TCP ensures reliable transport (Layer 4).
+  - DNS resolves domain names (Layer 7 over UDP/TCP).
+  - HTTP/HTTPS handles application data (Layer 7).
+- Inspect metadata when payload is encrypted (HTTPS).
 
 ## 4. Practical Use (Security Context)
-- Detect ARP spoofing:
+- Detect ARP poisoning:
   - One IP mapped to multiple MAC addresses.
-  - Excess ARP replies without requests.
+  - Excessive unsolicited ARP replies.
 - Detect ICMP tunneling:
-  - Unusual payload size in ICMP packets.
-- Detect port scanning:
-  - TCP RST, ACK responses indicate closed ports.
-- Detect DNS anomalies:
-  - DNS over TCP (port 53) may indicate abnormal behavior.
-- Inspect HTTP traffic:
-  - Plaintext data visible (URI, headers, content).
-- Decrypt HTTPS traffic:
-  - Requires private keys (e.g., RSA key import).
-- Reconstruct host activity:
-  - DNS queries reveal accessed domains.
+  - Abnormal payload size in ICMP packets.
+- Identify closed ports:
+  - TCP `RST, ACK` responses.
+- Detect suspicious DNS activity:
+  - DNS over TCP (port 53).
+- Analyze HTTPS behavior:
+  - TLS handshake anomalies.
+  - Certificate issuer and domain mismatch.
+  - Packet size and timing patterns (C2 beaconing, data exfiltration).
+- Investigate exploitation attempts:
+  - RPC traffic to domain controllers.
+  - SMB traffic associated with credential dumping.
 
 ## 5. Example
-- Filter ARP replies:
-  - `arp.opcode == 2`
-- Filter traffic for specific host:
+- Filter DNS traffic:
+  - `dns`
+- Identify target IP:
   - `ip.addr == 192.168.1.1`
-- Detect suspicious ARP behavior:
-  - Same IP associated with multiple MAC addresses.
-- Identify closed port:
-  - TCP response with `RST, ACK`.
+- Detect ARP replies:
+  - `arp.opcode == 2`
+- Observation:
+  - Multiple MAC addresses associated with one IP.
+- Conclusion:
+  - Possible ARP poisoning attack.
 
 ## 6. Key Takeaways
-- Analyze traffic using OSI layer structure.
-- Always stop capture before detailed analysis.
-- Focus on patterns, not individual packets.
-- Use filters to isolate relevant data.
-- Validate normal protocol behavior before identifying anomalies.
-- Combine protocol analysis with statistical views for context.
+- Effective analysis relies on filtering and pattern recognition.
+- OSI layer understanding is critical for packet interpretation.
+- Encrypted traffic still exposes behavioral indicators.
+- Protocol anomalies often indicate malicious activity.
+- Statistical tools improve visibility in large datasets.
 
 ## 7. Tags
-wireshark, packet-analysis, networking, tcp-ip, arp, dns, http, soc, traffic-analysis
+wireshark, packet-analysis, network-security, tcp-ip, dns, arp, icmp, http, https, soc
